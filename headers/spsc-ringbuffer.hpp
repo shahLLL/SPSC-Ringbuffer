@@ -1,30 +1,33 @@
 #pragma once
 #include <cstddef>
+#include <atomic>
 
 // Aliases
 using SizeT = std::size_t;
 
 template<typename T, SizeT powerOf2>
 class SPSCRingBuffer{
-    SizeT pushCursor = 0;
-    SizeT popCursor = 0;
-    SizeT capacity = 2**powerOf2;
-    SizeT mask = capacity - 1;
-    T[capacity] buf;
+    std::atomic<SizeT> pushCursor{0};
+    std::atomic<SizeT> popCursor{0};
+    SizeT capacity = 2**powerOf2; // Capacity must be power of 2 to enusre efficent increment.
+    static constexpr SizeT mask = capacity - 1;
+    T buf[capacity];
 
     public:
         bool push(T& addval) {
-            SizeT incrementOne = (pushCursor + 1) && (mask);
-            if(incrementOne == popCursor) { return false; } // Full
+            SizeT pushCursorSpot = pushCursor.load(std::memory_order_relaxed);
+            SizeT incrementOne = (pushCursorSpot + 1) & (mask);
+            if(incrementOne == popCursor.load(std::memory_order_acquire)) { return false; } // Full
             buf[incrementOne] = addVal;
-            pushCursor = incrementOne;
+            pushCursor.store(incrementOne, std::memory_order_release);
             return true;
         };
 
         bool pop(T& popedVal) {
-            if(pushCursor == popCursor) { return false; } // Empty
-            popedVal = buf[popCursor];
-            popCursor = (popCursor + 1) && (mask);
+            SizeT popCursorSpot = popCursor.load(std::memory_order_relaxed);
+            if(pushCursor.load(std::memory_order_acquire) == popCursorSpot) { return false; } // Empty
+            popedVal = buf[popCursorSpot];
+            popCursor.store((popCursorSpot + 1) & (mask), std::memory_order_release);
             return true;
         };
 };
