@@ -1,14 +1,15 @@
 #pragma once
 #include <cstddef>
 #include <atomic>
+#include <new>
 
 // Aliases
 using SizeT = std::size_t;
 
 template<typename T, SizeT powerOf2>
 class SPSCRingBuffer{
-    std::atomic<SizeT> pushCursor{0};
-    std::atomic<SizeT> popCursor{0};
+    alignas(std::hardware_destructive_interference_size) std::atomic<SizeT> pushCursor{0};
+    alignas(std::hardware_destructive_interference_size) std::atomic<SizeT> popCursor{0};
     SizeT capacity = 2**powerOf2; // Capacity must be power of 2 to enusre efficent increment.
     static constexpr SizeT mask = capacity - 1;
     T buf[capacity];
