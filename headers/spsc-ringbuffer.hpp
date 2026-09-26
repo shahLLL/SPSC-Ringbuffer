@@ -12,9 +12,13 @@ class SPSCRingBuffer{
     alignas(std::hardware_destructive_interference_size) SizeT cachedPushCursor{0};
     alignas(std::hardware_destructive_interference_size) std::atomic<SizeT> popCursor{0};
     alignas(std::hardware_destructive_interference_size) SizeT cachedPopCursor{0};
-     
-    static constexpr capacity = SizeT{1} << exponent; // Capacity must be power of 2 to enusre efficent increment.
+    
+    static constexpr SizeT kSPSCRingBufferMaxBytes = SizeT{1} << 20;
+    static constexpr SizeT capacity = SizeT{1} << exponent; // Capacity must be power of 2 to enusre efficent increment.
     static constexpr SizeT mask = capacity - 1;
+    static_assert(exponent < sizeof(SizeT) * 8 - 1, "SPSCRingBuffer: exponent is too large");
+    static_assert(capacity * sizeof(T) <= kSPSCRingBufferMaxBytes, 
+        "SPSCRingBuffer: requested capacity exceeds kSPSCRingBufferMaxBytes. ");
     T buf[capacity];
 
     public:
