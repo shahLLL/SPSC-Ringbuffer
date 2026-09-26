@@ -6,14 +6,14 @@
 // Aliases
 using SizeT = std::size_t;
 
-template<typename T, SizeT powerOf2>
+template<typename T, SizeT exponent>
 class SPSCRingBuffer{
     alignas(std::hardware_destructive_interference_size) std::atomic<SizeT> pushCursor{0};
     alignas(std::hardware_destructive_interference_size) SizeT cachedPushCursor = pushCursor;
     alignas(std::hardware_destructive_interference_size) std::atomic<SizeT> popCursor{0};
     alignas(std::hardware_destructive_interference_size) SizeT cachedPopCursor = popCursor;
      
-    SizeT capacity = 2**powerOf2; // Capacity must be power of 2 to enusre efficent increment.
+    SizeT capacity = SizeT{1} << exponent; // Capacity must be power of 2 to enusre efficent increment.
     static constexpr SizeT mask = capacity - 1;
     T buf[capacity];
 
