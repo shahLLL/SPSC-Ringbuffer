@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.12)
 project(spsc-ring-buffer LANGUAGES CXX)
 
+# Set Build Type to Release
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+
 # Require C++23
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
