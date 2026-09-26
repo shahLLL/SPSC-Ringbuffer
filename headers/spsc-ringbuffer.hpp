@@ -18,12 +18,12 @@ class SPSCRingBuffer{
     T buf[capacity];
 
     public:
-        bool push(T& addval) {
+        bool push(T& addVal) {
             SizeT pushCursorSpot = pushCursor.load(std::memory_order_relaxed);
             SizeT incrementOne = (pushCursorSpot + 1) & (mask);
 
             if(cachedPopCursor == incrementOne) { 
-                cachedPopCursor = popCursor.load(std::memory_order_acquire)
+                cachedPopCursor = popCursor.load(std::memory_order_acquire);
                 // Full
                 if(cachedPopCursor == incrementOne) return false;
             } 
