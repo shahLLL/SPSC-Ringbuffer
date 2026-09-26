@@ -13,8 +13,8 @@ class SPSCRingBuffer{
     alignas(std::hardware_destructive_interference_size) std::atomic<SizeT> popCursor{0};
     alignas(std::hardware_destructive_interference_size) SizeT cachedPopCursor{0};
      
-    const static constexpr capacity = SizeT{1} << exponent; // Capacity must be power of 2 to enusre efficent increment.
-    const static constexpr SizeT mask = capacity - 1;
+    static constexpr capacity = SizeT{1} << exponent; // Capacity must be power of 2 to enusre efficent increment.
+    static constexpr SizeT mask = capacity - 1;
     T buf[capacity];
 
     public:
@@ -27,7 +27,7 @@ class SPSCRingBuffer{
                 // Full
                 if(cachedPopCursor == incrementOne) return false;
             } 
-            buf[incrementOne] = addVal;
+            buf[pushCursorSpot] = addVal;
             pushCursor.store(incrementOne, std::memory_order_release);
             return true;
         };
