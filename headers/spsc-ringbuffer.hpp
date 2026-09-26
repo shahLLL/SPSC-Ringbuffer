@@ -18,7 +18,7 @@ class SPSCRingBuffer{
     T buf[capacity];
 
     public:
-        bool push(T& addVal) {
+        bool push(const T& addVal) {
             SizeT pushCursorSpot = pushCursor.load(std::memory_order_relaxed);
             SizeT incrementOne = (pushCursorSpot + 1) & (mask);
 
