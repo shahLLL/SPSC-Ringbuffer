@@ -9,9 +9,9 @@ using SizeT = std::size_t;
 template<typename T, SizeT exponent>
 class SPSCRingBuffer{
     alignas(std::hardware_destructive_interference_size) std::atomic<SizeT> pushCursor{0};
-    alignas(std::hardware_destructive_interference_size) SizeT cachedPushCursor = pushCursor;
+    alignas(std::hardware_destructive_interference_size) SizeT cachedPushCursor{0};
     alignas(std::hardware_destructive_interference_size) std::atomic<SizeT> popCursor{0};
-    alignas(std::hardware_destructive_interference_size) SizeT cachedPopCursor = popCursor;
+    alignas(std::hardware_destructive_interference_size) SizeT cachedPopCursor{0};
      
     const static constexpr capacity = SizeT{1} << exponent; // Capacity must be power of 2 to enusre efficent increment.
     const static constexpr SizeT mask = capacity - 1;
